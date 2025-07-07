@@ -25,7 +25,7 @@ def call(body) {
     def platform = config.get('platform', 'linux/amd64')
     def path = config.get('path', './Dockerfile')
 
-    sh "docker buildx --builder ${env.BUILDER} build --platform=${platform} -t ${host}/${project}/${name}:${tag} -t ${host}/${project}/${name}:latest --push . -f ${path}"
+    sh "docker buildx --builder ${env.BUILDER} build --platform=${platform} -t ${host}/${project}/${name}:${tag} -t ${host}/${project}/${name}:latest --cache-to type=registry,ref=${host}/${project}/${name}:buildcache,mode=max --cache-from type=registry,ref=${host}/${project}/${name}:buildcache --push . -f ${path}"
 }
 
 return this

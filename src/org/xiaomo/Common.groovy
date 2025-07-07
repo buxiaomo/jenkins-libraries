@@ -47,8 +47,12 @@ class Common {
     static def buildDockerCommand(host, project, name, tag, platform, path, enableCache, buildArgs, progress) {
         def command = []
         
+        // 判断是否为多平台构建
+        def isMultiPlatform = (platform == "linux/amd64,linux/arm64")
+        def builderName = isMultiPlatform ? "multi-platform" : "default"
+        
         // 基础命令
-        command << "docker buildx --builder ${tag} build"
+        command << "docker buildx --builder ${builderName} build"
         command << "--progress=${progress}"
         command << "--platform=${platform}"
         

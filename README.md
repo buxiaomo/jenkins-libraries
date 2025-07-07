@@ -9,7 +9,7 @@ jenkins-libraries/
 ├── README.md                    # 项目文档
 ├── src/
 │   └── org/
-│       └── jenkins/
+│       └── xiaomo/
 │           └── Common.groovy    # 通用工具类
 └── vars/
     └── BuildDockerImage.groovy  # Docker构建函数
@@ -19,10 +19,10 @@ jenkins-libraries/
 
 ### Common 工具类
 
-位于 `src/org/jenkins/Common.groovy`，提供可在多个共享库函数中复用的通用方法：
+位于 `src/org/xiaomo/Common.groovy`，提供可在多个共享库函数中复用的通用方法：
 
 - `validateAndGet()`: 参数验证和获取
-- `buildDockerCommand()`: Docker命令构建
+- `buildDockerCommand()`: Docker命令构建（支持智能builder选择）
 - `validateFileExists()`: 文件存在性验证
 - `validateEnvVar()`: 环境变量验证
 - `safeShellExecution()`: 安全的Shell命令执行
@@ -73,7 +73,7 @@ BuildDockerImage {
 | `project` | String | 否 | `env.JOB_NAME` | 项目名称 |
 | `name` | String | **是** | - | 应用名称 |
 | `tag` | String | 否 | `BUILD_NUMBER` 或 `latest` | 镜像标签 |
-| `platform` | String | 否 | `linux/amd64` | 目标平台，支持多平台用逗号分隔 |
+| `platform` | String | 否 | `linux/amd64` | 目标平台，当值为 `linux/amd64,linux/arm64` 时自动使用 `multi-platform` builder，否则使用 `default` builder |
 | `path` | String | 否 | `./Dockerfile` | Dockerfile文件路径 |
 | `enableCache` | Boolean | 否 | `true` | 是否启用构建缓存 |
 | `buildArgs` | List | 否 | `[]` | Docker构建参数列表 |
@@ -89,7 +89,7 @@ BuildDockerImage {
 #### 最佳实践
 
 1. **缓存优化**: 保持 `enableCache = true` 以提升构建速度
-2. **多平台构建**: 根据需要设置 `platform` 参数支持不同架构
+2. **多平台构建**: 当 `platform = 'linux/amd64,linux/arm64'` 时自动启用多平台构建模式
 3. **标签管理**: 使用语义化版本号作为标签
 4. **安全性**: 避免在构建参数中传递敏感信息
 5. **Dockerfile位置**: 将Dockerfile放在项目根目录或专门的docker目录中
@@ -101,7 +101,7 @@ BuildDockerImage {
 - **参数验证**: 使用 `Common.validateAndGet()` 进行统一的参数验证
 - **环境检查**: 通过 `Common.validateEnvVar()` 验证环境变量
 - **文件验证**: 使用 `Common.validateFileExists()` 确认文件存在
-- **命令构建**: `Common.buildDockerCommand()` 负责构建复杂的Docker命令
+- **命令构建**: `Common.buildDockerCommand()` 负责构建复杂的Docker命令，并根据platform自动选择合适的builder
 - **安全执行**: `Common.safeShellExecution()` 提供统一的错误处理和日志记录
 
 #### 错误处理
@@ -141,13 +141,13 @@ pipeline {
 ### 添加新的共享库函数
 
 1. 在 `vars/` 目录下创建新的 `.groovy` 文件
-2. 导入 `Common` 类：`import org.jenkins.Common`
+2. 导入 `Common` 类：`import org.xiaomo.Common`
 3. 使用 `Common` 类中的通用方法进行参数验证和错误处理
 4. 遵循现有的代码风格和文档规范
 
 ### 扩展Common类
 
-在 `src/org/jenkins/Common.groovy` 中添加新的静态方法，确保：
+在 `src/org/xiaomo/Common.groovy` 中添加新的静态方法，确保：
 - 方法是静态的（`static`）
 - 包含完整的JavaDoc注释
 - 遵循统一的错误处理模式

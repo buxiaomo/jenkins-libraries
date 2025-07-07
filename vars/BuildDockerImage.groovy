@@ -26,8 +26,8 @@ def call(body) {
     body()
 
     // 参数验证和默认值设置
-    def host = Common.validateAndGet(config, 'host', env.REGISTRY_HOST, '镜像仓库地址')
-    def project = Common.validateAndGet(config, 'project', env.JOB_NAME, '项目名称')
+    def host = Common.validateAndGet(config, 'host', env.REGISTRY_HOST, '镜像仓库地址', true)
+    def project = Common.validateAndGet(config, 'project', env.JOB_NAME, '项目名称', true)
     def name = Common.validateAndGet(config, 'name', null, '应用名称', true)
     def tag = config.get('tag', BUILD_NUMBER ?: 'latest')
     def platform = config.get('platform', 'linux/amd64')

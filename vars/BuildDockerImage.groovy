@@ -88,8 +88,7 @@ def call(body) {
     command << "-f ${path}"
 
 
-    def cmd = command.join(' \\
-    ')
+    def cmd = command.join(' ')
     echo "开始构建Docker镜像: ${host}/${project}/${name}:${tag}"
     echo "构建平台: ${platform}"
     echo "Dockerfile路径: ${path}"

@@ -63,6 +63,16 @@ BuildDockerImage {
     ]
     progress = 'plain'                     // 构建进度显示模式
 }
+
+// 在Jenkins Pipeline中使用环境变量和参数的正确语法
+BuildDockerImage {
+    host = env.REGISTRY_HOST                // 环境变量（无引号）
+    project = env.JOB_NAME                  // 环境变量（无引号）
+    name = 'admin'                          // 字符串常量（有引号）
+    tag = env.BUILD_NUMBER                  // 环境变量（无引号）
+    platform = params.platform             // 参数（无引号）
+    path = './Dockerfile'                   // 字符串常量（有引号）
+}
 ```
 
 #### 参数说明
@@ -135,6 +145,92 @@ pipeline {
     }
 }
 ```
+
+## 语法验证工具
+
+### ValidatePipelineSyntax 函数
+
+为了帮助开发者快速识别和修复常见的语法错误，我们提供了专门的验证工具：
+
+```groovy
+// 在Pipeline中使用语法验证
+ValidatePipelineSyntax {
+    checkEnvironmentVariables = true
+    checkParameters = true
+    suggestFixes = true
+}
+```
+
+该工具会：
+- 检查常用环境变量是否存在
+- 验证Pipeline参数配置
+- 提供语法修复建议
+- 显示正确的使用示例
+
+### 自动语法检查
+
+`BuildDockerImage`函数现在包含自动语法验证，会在执行前检查配置并提供详细的错误信息和修复建议。
+
+## 故障排除
+
+### 常见语法错误
+
+**错误**: `Expected a step @ line X, column Y`
+
+**原因**: 在BuildDockerImage闭包中使用了错误的语法
+
+**解决方案**:
+```groovy
+// ❌ 错误写法 - 环境变量使用了引号或${}语法
+BuildDockerImage {
+    host = '${env.REGISTRY_HOST}'     // 错误：字符串中的变量
+    tag = ${BUILD_NUMBER}             // 错误：缺少引号
+    name = admin                      // 错误：字符串需要引号
+}
+
+// ✅ 正确写法
+BuildDockerImage {
+    host = env.REGISTRY_HOST          // 正确：直接引用环境变量
+    tag = env.BUILD_NUMBER            // 正确：直接引用环境变量
+    name = 'my-app'                   // 正确：字符串常量用引号
+}
+```
+
+### 语法规则
+
+1. **环境变量**: 使用 `env.VARIABLE_NAME`（无引号）
+2. **参数**: 使用 `params.parameter_name`（无引号）
+3. **字符串常量**: 使用单引号或双引号包围
+4. **布尔值**: 直接使用 `true` 或 `false`
+5. **数组**: 使用方括号 `['item1', 'item2']`
+
+### 错误检测和修复
+
+`BuildDockerImage`和`ValidatePipelineSyntax`函数会自动检测以下常见错误：
+
+1. **${} 语法错误**: 自动检测并提示正确用法
+2. **BUILD_NUMBER 错误**: 检测裸露的`BUILD_NUMBER`并建议使用`env.BUILD_NUMBER`
+3. **字符串引号缺失**: 检测未加引号的字符串常量
+4. **环境变量和参数验证**: 检查必需的环境变量是否存在
+
+### 调试技巧
+
+1. 使用`ValidatePipelineSyntax`函数进行预检查
+2. 检查所有字符串是否正确加引号
+3. 确认环境变量使用`env.`前缀
+4. 确认参数使用`params.`前缀
+5. 避免使用`${}`语法在闭包参数中
+6. 注意`BUILD_NUMBER`应写作`env.BUILD_NUMBER`
+7. 使用Jenkins的Pipeline语法生成器验证语法
+
+### 完整示例
+
+查看 <mcfile name="correct-pipeline-example.groovy" path="/Users/peng.liu/workspace/src/jenkins-libraries/examples/correct-pipeline-example.groovy"></mcfile> 文件，了解完整的正确使用示例，包括：
+
+- 正确的参数和环境变量语法
+- ValidatePipelineSyntax的使用
+- BuildDockerImage的最佳实践
+- 常见错误对比和修复方法
 
 ## 扩展开发
 

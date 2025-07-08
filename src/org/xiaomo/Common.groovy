@@ -20,6 +20,11 @@ class Common {
     static def validateAndGet(config, key, defaultValue, description, required = false) {
         def value = config.get(key, defaultValue)
         
+        // 检查常见的语法错误
+        if (value instanceof String && value.contains('${')) {
+            error("参数 '${key}' 包含错误的变量语法 '\${...}'。请使用 env.VARIABLE_NAME 或 params.parameter_name 代替。")
+        }
+        
         if (required && (!value || value.toString().trim().isEmpty())) {
             error("必需参数 '${key}' (${description}) 不能为空")
         }
@@ -121,5 +126,39 @@ class Common {
         } catch (Exception e) {
             script.error("${description}失败: ${e.getMessage()}")
         }
+    }
+    
+    /**
+     * 验证BuildDockerImage配置的语法正确性
+     * @param config 配置对象
+     * @param script Jenkins脚本上下文
+     */
+    static def validateBuildDockerImageSyntax(config, script) {
+        script.echo "验证BuildDockerImage配置语法..."
+        
+        // 检查常见的语法错误
+        config.each { key, value ->
+            if (value instanceof String) {
+                if (value.contains('${') && !value.startsWith('./') && !value.startsWith('/')) {
+                    script.error("""
+❌ 参数 '${key}' 语法错误: ${value}
+💡 修复建议:
+   - 如果是环境变量，使用: env.VARIABLE_NAME
+   - 如果是参数，使用: params.parameter_name
+   - 如果是字符串常量，使用: 'string_value'
+                    """)
+                }
+            }
+        }
+        
+        // 检查BUILD_NUMBER的常见错误
+        if (config.tag && config.tag.toString() == 'BUILD_NUMBER') {
+            script.error("""
+❌ 参数 'tag' 语法错误: BUILD_NUMBER
+💡 正确写法: tag = env.BUILD_NUMBER
+            """)
+        }
+        
+        script.echo "✓ 配置语法验证通过"
     }
 }

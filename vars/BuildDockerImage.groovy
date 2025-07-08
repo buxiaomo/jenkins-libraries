@@ -17,6 +17,16 @@ import org.xiaomo.Common
  *     buildArgs = ['ARG1=value1']         // 构建参数
  *     progress = 'plain'                  // 构建进度显示模式
  * }
+ *
+ * 在Jenkins Pipeline中使用环境变量的正确语法:
+ * BuildDockerImage {
+ *     host = env.REGISTRY_HOST            // 使用环境变量（无引号）
+ *     project = env.JOB_NAME              // 使用环境变量（无引号）
+ *     name = 'admin'                      // 字符串常量（有引号）
+ *     tag = env.BUILD_NUMBER              // 使用环境变量（无引号）
+ *     platform = params.platform         // 使用参数（无引号）
+ *     path = './Dockerfile'               // 字符串常量（有引号）
+ * }
  */
 
 def call(body) {
@@ -24,6 +34,9 @@ def call(body) {
     body.resolveStrategy = Closure.DELEGATE_FIRST
     body.delegate = config
     body()
+
+    // 验证配置语法
+    Common.validateBuildDockerImageSyntax(config, this)
 
     // 参数验证和默认值设置
     def host = Common.validateAndGet(config, 'host', env.REGISTRY_HOST, '镜像仓库地址', true)

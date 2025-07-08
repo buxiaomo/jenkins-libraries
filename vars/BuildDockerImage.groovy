@@ -84,6 +84,7 @@ def call(script, body) {
 
     def cmd = command.join(" ")
 
+    script.echo "📋 构建命令: ${cmd}"
     script.sh cmd
 }
 

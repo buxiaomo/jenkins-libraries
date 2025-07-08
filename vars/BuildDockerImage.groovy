@@ -34,7 +34,7 @@ def call(script, body) {
     body()
 
     def host = config.host
-    def project = config.project
+    def project = config.get('project', env.JOB_NAME)
     def name = config.name
     def tag = config.get('tag', env.BUILD_NUMBER)
     def platform = config.platform

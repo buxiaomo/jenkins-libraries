@@ -27,16 +27,16 @@
  * }
  */
 
-def call(body) {
+def call(script, body) {
     def config = [:]
     body.resolveStrategy = Closure.DELEGATE_FIRST
     body.delegate = config
     body()
 
-    def host = config.get('host', env.REGISTRY_HOST)
-    def project = config.get('project', env.JOB_NAME)
+    def host = config.get('host', script.env.REGISTRY_HOST)
+    def project = config.get('project', script.env.JOB_NAME)
     def name = config.get('name', null)
-    def tag = config.get('tag', null)
+    def tag = config.get('tag', script.env.BUILD_NUMBER)
     def platform = config.get('platform', 'linux/amd64')
     def path = config.get('path', './Dockerfile')
     def enableCache = config.get('enableCache', true)
@@ -78,11 +78,10 @@ def call(body) {
 
     def cmd = command.join(" ")
 
-    echo "🐳 开始构建Docker镜像..."
-    echo "📋 构建命令: ${cmd}"
+    script.echo "🐳 开始构建Docker镜像..."
+    script.echo "📋 构建命令: ${cmd}"
 
-    // 使用错误恢复机制执行Docker构建
-    sh cmd
+    script.sh cmd
 }
 
 return this

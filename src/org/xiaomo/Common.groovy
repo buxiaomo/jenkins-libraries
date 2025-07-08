@@ -99,16 +99,30 @@ class Common {
     
     /**
      * 验证环境变量是否设置
-     * @param script Jenkins脚本上下文
+     * @param env 环境变量对象
      * @param envVar 环境变量名
      * @param description 环境变量描述
      * @return true如果环境变量已设置
      */
-    static def validateEnvVar(script, envVar, description = '环境变量') {
-        if (!script.env[envVar]) {
-            script.error("${description} ${envVar} 未设置")
+    static def validateEnvVar(env, envVar, description = '环境变量') {
+        if (!env || !env[envVar]) {
+            throw new IllegalArgumentException("${description} ${envVar} 未设置")
         }
         return true
+    }
+    
+    /**
+     * 安全地获取环境变量值
+     * @param env 环境变量对象
+     * @param envVar 环境变量名
+     * @param defaultValue 默认值
+     * @return 环境变量值或默认值
+     */
+    static def getEnvVar(env, envVar, defaultValue = null) {
+        if (!env) {
+            return defaultValue
+        }
+        return env[envVar] ?: defaultValue
     }
     
     /**

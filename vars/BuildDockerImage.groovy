@@ -36,13 +36,18 @@ def call(body) {
     body()
 
     // 验证配置语法
-    // Common.validateBuildDockerImageSyntax(config, this)
+    Common.validateBuildDockerImageSyntax(config, this)
 
+    // 安全地获取环境变量
+    def registryHost = Common.getEnvVar(env, 'REGISTRY_HOST', null)
+    def jobName = Common.getEnvVar(env, 'JOB_NAME', null)
+    def buildNumber = Common.getEnvVar(env, 'BUILD_NUMBER', 'latest')
+    
     // 参数验证和默认值设置
-    def host = Common.validateAndGet(config, 'host', env.REGISTRY_HOST, '镜像仓库地址', true)
-    def project = Common.validateAndGet(config, 'project', env.JOB_NAME, '项目名称', true)
+    def host = Common.validateAndGet(config, 'host', registryHost, '镜像仓库地址', true)
+    def project = Common.validateAndGet(config, 'project', jobName, '项目名称', true)
     def name = Common.validateAndGet(config, 'name', null, '应用名称', true)
-    def tag = config.get('tag', BUILD_NUMBER ?: 'latest')
+    def tag = config.get('tag', buildNumber)
     def platform = config.get('platform', 'linux/amd64')
     def path = config.get('path', './Dockerfile')
     def enableCache = config.get('enableCache', true)
@@ -50,51 +55,27 @@ def call(body) {
     def progress = config.get('progress', 'auto')
 
     // 验证必需的环境变量
-    // Common.validateEnvVar(this, 'BUILDER', '环境变量')
+    try {
+        Common.validateEnvVar(env, 'REGISTRY_HOST', '镜像仓库地址环境变量')
+    } catch (IllegalArgumentException e) {
+        if (!config.host) {
+            error("${e.getMessage()}，或者请在配置中明确指定 host 参数")
+        }
+    }
 
     // 验证Dockerfile是否存在
-    // Common.validateFileExists(this, path, 'Dockerfile')
+    Common.validateFileExists(this, path, 'Dockerfile')
 
     // 构建Docker命令
-    // def dockerCommand = Common.buildDockerCommand(host, project, name, tag, platform, path, enableCache, buildArgs, progress)
+    def dockerCommand = Common.buildDockerCommand(host, project, name, tag, platform, path, enableCache, buildArgs, progress)
     
-    def command = []
-
-    def isMultiPlatform = (platform == "linux/amd64,linux/arm64")
-    def builderName = isMultiPlatform ? "multi-platform" : "default"
-
-    // 基础命令
-    command << "docker buildx --builder ${builderName} build"
-    command << "--progress=${progress}"
-    command << "--platform=${platform}"
-
-    buildArgs.each { arg ->
-        command << "--build-arg ${arg}"
-    }
-
-    // 镜像标签
-    command << "-t ${host}/${project}/${name}:${tag}"
-    command << "-t ${host}/${project}/${name}:latest"
-
-    // 缓存配置
-    if (enableCache) {
-        def cacheRef = "${host}/${project}/${name}:buildcache"
-        command << "--cache-to type=registry,ref=${cacheRef},mode=max"
-        command << "--cache-from type=registry,ref=${cacheRef}"
-    }
-
-    // 推送和文件路径
-    command << "--push ."
-    command << "-f ${path}"
-
-
-    def cmd = command.join(' ')
     echo "开始构建Docker镜像: ${host}/${project}/${name}:${tag}"
     echo "构建平台: ${platform}"
     echo "Dockerfile路径: ${path}"
-    sh cmd
+    echo "执行命令: ${dockerCommand}"
+    
     // 执行Docker构建命令
-    // Common.safeShellExecution(this, dockerCommand, "Docker镜像构建")
+    Common.safeShellExecution(this, dockerCommand, "Docker镜像构建")
 }
 
 return this

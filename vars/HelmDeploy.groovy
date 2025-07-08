@@ -25,6 +25,8 @@ def call(script, body) {
 
     def command = []
     command << "helm upgrade -i ${name} "
+    command << "${path}"
+    command << "--namespace ${namespace}"
     command << "--create-namespace"
     // 构建参数
     set.each { arg ->

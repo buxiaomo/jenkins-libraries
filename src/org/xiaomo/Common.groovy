@@ -81,8 +81,7 @@ class Common {
         command << "--push ."
         command << "-f ${path}"
         
-        return command.join(' \\
-            ')
+        return command.join(" ")
     }
     
     /**

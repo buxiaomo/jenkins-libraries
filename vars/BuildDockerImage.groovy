@@ -50,7 +50,7 @@ def call(script, body) {
     def builderName = isMultiPlatform ? "multi-platform" : "default"
 
     if (builderName == "default") {
-        enableCache = false
+        def enableCache = false
     } else {
         def enableCache = config.enableCache
     }

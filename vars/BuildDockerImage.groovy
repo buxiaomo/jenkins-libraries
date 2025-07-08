@@ -51,7 +51,7 @@ def call(script, body) {
 
     if (builderName == "default") {
         enableCache = false
-    else {
+    } else {
         def enableCache = config.enableCache
     }
 

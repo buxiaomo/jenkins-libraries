@@ -36,7 +36,7 @@ def call(body) {
     body()
 
     // 验证配置语法
-    Common.validateBuildDockerImageSyntax(config, this)
+    // Common.validateBuildDockerImageSyntax(config, this)
 
     // 参数验证和默认值设置
     def host = Common.validateAndGet(config, 'host', env.REGISTRY_HOST, '镜像仓库地址', true)
@@ -50,20 +50,52 @@ def call(body) {
     def progress = config.get('progress', 'auto')
 
     // 验证必需的环境变量
-    Common.validateEnvVar(this, 'BUILDER', '环境变量')
+    // Common.validateEnvVar(this, 'BUILDER', '环境变量')
 
     // 验证Dockerfile是否存在
-    Common.validateFileExists(this, path, 'Dockerfile')
+    // Common.validateFileExists(this, path, 'Dockerfile')
 
     // 构建Docker命令
-    def dockerCommand = Common.buildDockerCommand(host, project, name, tag, platform, path, enableCache, buildArgs, progress)
+    // def dockerCommand = Common.buildDockerCommand(host, project, name, tag, platform, path, enableCache, buildArgs, progress)
     
+    def command = []
+
+    def isMultiPlatform = (platform == "linux/amd64,linux/arm64")
+    def builderName = isMultiPlatform ? "multi-platform" : "default"
+
+    // 基础命令
+    command << "docker buildx --builder ${builderName} build"
+    command << "--progress=${progress}"
+    command << "--platform=${platform}"
+
+    buildArgs.each { arg ->
+        command << "--build-arg ${arg}"
+    }
+
+    // 镜像标签
+    command << "-t ${host}/${project}/${name}:${tag}"
+    command << "-t ${host}/${project}/${name}:latest"
+
+    // 缓存配置
+    if (enableCache) {
+        def cacheRef = "${host}/${project}/${name}:buildcache"
+        command << "--cache-to type=registry,ref=${cacheRef},mode=max"
+        command << "--cache-from type=registry,ref=${cacheRef}"
+    }
+
+    // 推送和文件路径
+    command << "--push ."
+    command << "-f ${path}"
+
+
+    def cmd = command.join(' \\
+    ')
     echo "开始构建Docker镜像: ${host}/${project}/${name}:${tag}"
     echo "构建平台: ${platform}"
     echo "Dockerfile路径: ${path}"
-    
+    sh cmd
     // 执行Docker构建命令
-    Common.safeShellExecution(this, dockerCommand, "Docker镜像构建")
+    // Common.safeShellExecution(this, dockerCommand, "Docker镜像构建")
 }
 
 return this

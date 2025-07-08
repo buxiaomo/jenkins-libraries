@@ -82,7 +82,7 @@ class Common {
         command << "-f ${path}"
         
         return command.join(' \\
-    ')
+            ')
     }
     
     /**

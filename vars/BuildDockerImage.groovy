@@ -90,13 +90,45 @@ def call(body) {
         ConfigValidator.generateConfigReport(finalConfig, this)
 
         // 构建Docker命令
-         def dockerCommand = Common.buildDockerCommand(finalConfig)
+        def command = []
+        
+        // 判断是否为多平台构建
+        def isMultiPlatform = (platform == "linux/amd64,linux/arm64")
+        def builderName = isMultiPlatform ? "multi-platform" : "default"
+        
+        // 基础命令
+        command << "docker buildx --builder ${builderName} build"
+        command << "--progress=${progress}"
+        command << "--platform=${platform}"
+        
+        // 构建参数
+        buildArgs.each { arg ->
+            command << "--build-arg ${arg}"
+        }
+        
+        // 镜像标签
+        command << "-t ${host}/${project}/${name}:${tag}"
+        command << "-t ${host}/${project}/${name}:latest"
+        
+        // 缓存配置
+        if (enableCache) {
+            def cacheRef = "${host}/${project}/${name}:buildcache"
+            command << "--cache-to type=registry,ref=${cacheRef},mode=max"
+            command << "--cache-from type=registry,ref=${cacheRef}"
+        }
+        
+        // 推送和文件路径
+        command << "--push ."
+        command << "-f ${path}"
+        
+        def cmd = command.join(" ")
          
          echo "🐳 开始构建Docker镜像..."
-         echo "📋 构建命令: ${dockerCommand}"
+         echo "📋 构建命令: ${cmd}"
         
         // 使用错误恢复机制执行Docker构建
-        ErrorRecovery.safeDockerExecution(this, dockerCommand, "Docker镜像构建")
+        sh cmd
+        // ErrorRecovery.safeDockerExecution(this, dockerCommand, "Docker镜像构建")
         
     } catch (Exception e) {
         // 使用智能错误分析

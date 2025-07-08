@@ -52,7 +52,7 @@ def call(script, body) {
     if (builderName == "default") {
         def enableCache = false
     } else {
-        def enableCache = config.enableCache
+        def enableCache = true
     }
 
     // 基础命令

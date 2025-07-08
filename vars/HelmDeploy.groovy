@@ -20,6 +20,7 @@ def call(script, body) {
 
     def name = config.name
     def namespace = config.namespace
+    def path = config.path
     def set = config.set
 
     def command = []

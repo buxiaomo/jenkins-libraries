@@ -36,7 +36,7 @@ def call(script, body) {
     def host = config.host
     def project = config.project
     def name = config.name
-    def tag = config.get('tag', env.globalNum)
+    def tag = config.get('tag', env.BUILD_NUMBER)
     def platform = config.platform
     def path = config.path
     def enableCache = config.enableCache

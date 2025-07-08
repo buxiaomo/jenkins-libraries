@@ -33,7 +33,7 @@ def call(script, body) {
     body.delegate = config
     body()
 
-    def host = config.host
+    def host = config.get('host', env.REGISTRY_HOST)
     def project = config.get('project', env.JOB_NAME)
     def name = config.name
     def tag = config.get('tag', env.BUILD_NUMBER)

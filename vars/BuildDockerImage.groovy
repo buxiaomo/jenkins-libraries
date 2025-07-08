@@ -33,14 +33,14 @@ def call(script, body) {
     body.delegate = config
     body()
 
-    def host = config.get('host', script.env.REGISTRY_HOST)
-    def project = config.get('project', script.env.JOB_NAME)
-    def name = config.get('name', null)
-    def tag = config.get('tag', script.env.BUILD_NUMBER)
-    def platform = config.get('platform', 'linux/amd64')
-    def path = config.get('path', './Dockerfile')
-    def enableCache = config.get('enableCache', true)
-    def buildArgs = config.get('buildArgs', [])
+    def host = ${config.host}
+    def project = ${config.project}
+    def name = ${config.name}
+    def tag = ${config.tag}
+    def platform = ${config.platform}
+    def path = ${config.path}
+    def enableCache = ${config.enableCache}
+    def buildArgs = ${config.buildArgs}
     def progress = config.get('progress', 'auto')
 
     // 构建Docker命令

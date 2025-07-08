@@ -51,7 +51,7 @@ def call(script, body) {
     def builderName = isMultiPlatform ? "multi-platform" : "default"
 
     if (builderName == "default") {
-        def enableCache = false
+        enableCache = false
     }
 
     // 基础命令

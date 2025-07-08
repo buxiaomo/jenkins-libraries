@@ -4,7 +4,7 @@
  * BuildDockerImage - Jenkins共享库函数，用于构建和推送Docker镜像
  * 
  * 使用示例:
- * BuildDockerImage {
+ * BuildDockerImage(this) {
  *     host = '192.168.1.1:5000'          // 镜像仓库地址
  *     project = 'projectName'             // 项目名称
  *     name = 'appname'                    // 应用名称（必需）
@@ -17,7 +17,7 @@
  * }
  *
  * 在Jenkins Pipeline中使用环境变量的正确语法:
- * BuildDockerImage {
+ * BuildDockerImage(this) {
  *     host = env.REGISTRY_HOST            // 使用环境变量（无引号）
  *     project = env.JOB_NAME              // 使用环境变量（无引号）
  *     name = 'admin'                      // 字符串常量（有引号）
@@ -36,7 +36,7 @@ def call(script, body) {
     def host = config.host
     def project = config.project
     def name = config.name
-    def tag = config.tag
+    def tag = config.get('tag', env.globalNum)
     def platform = config.platform
     def path = config.path
     def enableCache = config.enableCache
@@ -49,6 +49,10 @@ def call(script, body) {
     // 判断是否为多平台构建
     def isMultiPlatform = (platform == "linux/amd64,linux/arm64")
     def builderName = isMultiPlatform ? "multi-platform" : "default"
+
+    if (builderName == "default") {
+        def enableCache = false
+    }
 
     // 基础命令
     command << "docker buildx --builder ${builderName} build"
@@ -77,9 +81,6 @@ def call(script, body) {
     command << "."
 
     def cmd = command.join(" ")
-
-    script.echo "🐳 开始构建Docker镜像..."
-    script.echo "📋 构建命令: ${cmd}"
 
     script.sh cmd
 }

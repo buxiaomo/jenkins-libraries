@@ -39,7 +39,6 @@ def call(script, body) {
     def tag = config.get('tag', env.BUILD_NUMBER)
     def platform = config.platform
     def path = config.path
-    def enableCache = config.enableCache
     def buildArgs = config.buildArgs
     def progress = config.get('progress', 'auto')
 
@@ -52,6 +51,8 @@ def call(script, body) {
 
     if (builderName == "default") {
         enableCache = false
+    else {
+        def enableCache = config.enableCache
     }
 
     // 基础命令

@@ -41,6 +41,7 @@ def call(script, body) {
     def path = config.path
     def buildArgs = config.buildArgs
     def progress = config.get('progress', 'auto')
+    def enableCache = false
 
     // 构建Docker命令
     def command = []
@@ -50,9 +51,9 @@ def call(script, body) {
     def builderName = isMultiPlatform ? "multi-platform" : "default"
 
     if (builderName == "default") {
-        def enableCache = false
+        enableCache = false
     } else {
-        def enableCache = true
+        enableCache = true
     }
 
     // 基础命令

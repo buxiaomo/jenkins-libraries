@@ -1,6 +1,8 @@
 #!/usr/bin/env groovy
 
 import org.xiaomo.Common
+import org.xiaomo.ConfigValidator
+import org.xiaomo.ErrorRecovery
 
 /**
  * BuildDockerImage - Jenkins共享库函数，用于构建和推送Docker镜像
@@ -34,48 +36,75 @@ def call(body) {
     body.resolveStrategy = Closure.DELEGATE_FIRST
     body.delegate = config
     body()
-
-    // 验证配置语法
-    Common.validateBuildDockerImageSyntax(config, this)
-
-    // 安全地获取环境变量
-    def registryHost = Common.getEnvVar(env, 'REGISTRY_HOST', null)
-    def jobName = Common.getEnvVar(env, 'JOB_NAME', null)
-    def buildNumber = Common.getEnvVar(env, 'BUILD_NUMBER', 'latest')
     
-    // 参数验证和默认值设置
-    def host = Common.validateAndGet(config, 'host', registryHost, '镜像仓库地址', true)
-    def project = Common.validateAndGet(config, 'project', jobName, '项目名称', true)
-    def name = Common.validateAndGet(config, 'name', null, '应用名称', true)
-    def tag = config.get('tag', buildNumber)
-    def platform = config.get('platform', 'linux/amd64')
-    def path = config.get('path', './Dockerfile')
-    def enableCache = config.get('enableCache', true)
-    def buildArgs = config.get('buildArgs', [])
-    def progress = config.get('progress', 'auto')
-
-    // 验证必需的环境变量
+    def recoveryContext = null
+    
     try {
-        Common.validateEnvVar(env, 'REGISTRY_HOST', '镜像仓库地址环境变量')
-    } catch (IllegalArgumentException e) {
-        if (!config.host) {
-            error("${e.getMessage()}，或者请在配置中明确指定 host 参数")
+        // 创建错误恢复上下文
+        recoveryContext = ErrorRecovery.createRecoveryContext(this, config, env)
+        
+        // 使用错误恢复机制进行配置验证
+        def validationResults = ErrorRecovery.safeExecute(this, "配置验证", {
+            return ConfigValidator.validateBuildDockerImageConfig(config, this, env)
+        })
+        
+        // 安全地获取配置参数
+        def host = ErrorRecovery.safeGetEnvVar(this, env, 'REGISTRY_HOST', config.get('host'), false)
+        def project = ErrorRecovery.safeGetEnvVar(this, env, 'JOB_NAME', config.get('project'), false)
+        def name = config.get('name', null)
+        def tag = ErrorRecovery.safeGetEnvVar(this, env, 'BUILD_NUMBER', config.get('tag', 'latest'), false)
+        def platform = config.get('platform', 'linux/amd64')
+        def path = config.get('path', './Dockerfile')
+        def enableCache = config.get('enableCache', true)
+        def buildArgs = config.get('buildArgs', [])
+        def progress = config.get('progress', 'auto')
+        
+        // 验证必需参数
+        if (!host) {
+            error("镜像仓库地址未设置。请设置 REGISTRY_HOST 环境变量或在配置中指定 host 参数。")
         }
+        if (!project) {
+            error("项目名称未设置。请设置 JOB_NAME 环境变量或在配置中指定 project 参数。")
+        }
+        if (!name) {
+            error("应用名称未设置。请在配置中指定 name 参数。")
+        }
+        
+        // 验证Dockerfile是否存在
+        ErrorRecovery.safeExecute(this, "Dockerfile验证", {
+            Common.validateFileExists(this, path, 'Dockerfile')
+        })
+        
+        // 生成配置报告
+        def finalConfig = [
+            host: host,
+            project: project,
+            name: name,
+            tag: tag,
+            platform: platform,
+            path: path,
+            enableCache: enableCache,
+            buildArgs: buildArgs,
+            progress: progress
+        ]
+        ConfigValidator.generateConfigReport(finalConfig, this)
+
+        // 构建Docker命令
+         def dockerCommand = Common.buildDockerCommand(finalConfig)
+         
+         echo "🐳 开始构建Docker镜像..."
+         echo "📋 构建命令: ${dockerCommand}"
+        
+        // 使用错误恢复机制执行Docker构建
+        ErrorRecovery.safeDockerExecution(this, dockerCommand, "Docker镜像构建")
+        
+    } catch (Exception e) {
+        // 使用智能错误分析
+        ErrorRecovery.analyzeAndSuggest(this, e, recoveryContext)
+        
+        // 重新抛出异常
+        throw e
     }
-
-    // 验证Dockerfile是否存在
-    Common.validateFileExists(this, path, 'Dockerfile')
-
-    // 构建Docker命令
-    def dockerCommand = Common.buildDockerCommand(host, project, name, tag, platform, path, enableCache, buildArgs, progress)
-    
-    echo "开始构建Docker镜像: ${host}/${project}/${name}:${tag}"
-    echo "构建平台: ${platform}"
-    echo "Dockerfile路径: ${path}"
-    echo "执行命令: ${dockerCommand}"
-    
-    // 执行Docker构建命令
-    Common.safeShellExecution(this, dockerCommand, "Docker镜像构建")
 }
 
 return this

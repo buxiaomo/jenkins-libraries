@@ -223,14 +223,110 @@ BuildDockerImage {
 6. 注意`BUILD_NUMBER`应写作`env.BUILD_NUMBER`
 7. 使用Jenkins的Pipeline语法生成器验证语法
 
-### 完整示例
+### 完整示例和故障排除
 
-查看 <mcfile name="correct-pipeline-example.groovy" path="/Users/peng.liu/workspace/src/jenkins-libraries/examples/correct-pipeline-example.groovy"></mcfile> 文件，了解完整的正确使用示例，包括：
-
+**基础示例文件：**
+查看 <mcfile name="correct-pipeline-example.groovy" path="/Users/peng.liu/workspace/src/jenkins-libraries/examples/correct-pipeline-example.groovy"></mcfile> 文件，了解基础使用示例，包括：
 - 正确的参数和环境变量语法
-- ValidatePipelineSyntax的使用
-- BuildDockerImage的最佳实践
+- `ValidatePipelineSyntax` 的使用
+- `BuildDockerImage` 的最佳实践
 - 常见错误对比和修复方法
+
+**增强示例文件：**
+查看 <mcfile name="enhanced-pipeline-example.groovy" path="/Users/peng.liu/workspace/src/jenkins-libraries/examples/enhanced-pipeline-example.groovy"></mcfile> 文件，了解高级功能示例，包括：
+- 智能配置验证和错误恢复
+- 多平台构建配置
+- 自动重试和环境清理
+- 完整的错误处理和调试
+- 生产环境最佳实践
+
+**故障排除指南：**
+查看 <mcfile name="troubleshooting-guide.md" path="/Users/peng.liu/workspace/src/jenkins-libraries/docs/troubleshooting-guide.md"></mcfile> 文件，获取详细的故障排除指南，包括：
+
+- NullPointerException 错误解决方案
+- Expected a step 编译错误修复
+- 环境变量配置问题
+- Docker 构建失败排查
+- 调试技巧和最佳实践
+
+## 新增功能
+
+### 智能配置验证 (ConfigValidator)
+- 全面的配置语法检查和验证
+- 自动检测常见的 Groovy 语法错误
+- 环境变量依赖性分析
+- 参数完整性验证
+- 优化建议和最佳实践提示
+- 详细的配置报告生成
+
+### 多层错误恢复机制 (ErrorRecovery)
+- 智能重试机制（最多3次重试）
+- 多种环境变量获取策略
+- Docker命令执行的备用方案
+- 智能错误分析和修复建议
+- 上下文感知的错误诊断
+- 自动环境清理和恢复
+
+### 增强的错误处理
+- 改进的参数验证
+- 更清晰的错误消息
+- 自动的语法检查
+- 错误上下文收集和分析
+
+## 错误恢复特性
+
+### 自动重试机制
+- 失败操作自动重试最多3次
+- 指数退避策略（2秒、4秒、6秒）
+- Docker环境自动清理和恢复
+
+### 多策略环境变量获取
+1. 直接从 `env` 对象获取
+2. 使用 Jenkins 内置方法
+3. 系统属性获取
+4. Shell 命令获取
+5. 使用默认值或配置值
+
+### 智能错误诊断
+- 自动分析错误类型和原因
+- 提供针对性的修复建议
+- 输出相关的调试命令
+- 收集错误上下文信息
+
+### 配置验证增强
+- 语法错误自动检测
+- 环境变量依赖分析
+- 参数完整性检查
+- 性能优化建议
+- 安全性检查
+
+## 版本更新说明
+
+### v2.0.0 - 错误恢复和智能验证
+**新增功能：**
+- 🆕 `ConfigValidator` 类：智能配置验证和优化建议
+- 🆕 `ErrorRecovery` 类：多层错误恢复机制
+- 🆕 自动重试机制（最多3次，指数退避）
+- 🆕 多策略环境变量获取
+- 🆕 智能错误分析和修复建议
+- 🆕 Docker环境自动清理和恢复
+
+**改进功能：**
+- 🔧 增强的 `BuildDockerImage` 错误处理
+- 🔧 更安全的环境变量访问
+- 🔧 详细的配置报告生成
+- 🔧 上下文感知的错误诊断
+
+**修复问题：**
+- ✅ 解决 `NullPointerException` 在访问环境变量时的问题
+- ✅ 修复多行字符串拼接语法错误
+- ✅ 改进错误消息的可读性
+- ✅ 增强对不同Jenkins环境的兼容性
+
+### v1.0.0 - 基础功能
+- 基础的 `BuildDockerImage` 功能
+- `ValidatePipelineSyntax` 语法验证
+- 基本的错误处理和参数验证
 
 ## 扩展开发
 

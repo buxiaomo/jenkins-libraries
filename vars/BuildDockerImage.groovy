@@ -50,6 +50,12 @@ def call(script, body) {
     def isMultiPlatform = (platform == "linux/amd64,linux/arm64")
     def builderName = isMultiPlatform ? "multi-platform" : "default"
 
+    if (builderName == "default") {
+        enableCache = false
+    } else {
+        enableCache = true
+    }
+
     // 基础命令
     command << "docker buildx --builder ${builderName} build"
     command << "--progress=${progress}"
@@ -64,9 +70,12 @@ def call(script, body) {
     command << "-t ${host}/${project}/${name}:${tag}"
     command << "-t ${host}/${project}/${name}:latest"
 
-    def cacheRef = "${host}/${project}/${name}:buildcache"
-    command << "--cache-to type=registry,ref=${cacheRef},mode=max"
-    command << "--cache-from type=registry,ref=${cacheRef}"
+    // 缓存配置
+    if (enableCache) {
+        def cacheRef = "${host}/${project}/${name}:buildcache"
+        command << "--cache-to type=registry,ref=${cacheRef},mode=max"
+        command << "--cache-from type=registry,ref=${cacheRef}"
+    }
 
     // 推送和文件路径
     command << "--push"

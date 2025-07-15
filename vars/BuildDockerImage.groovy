@@ -42,7 +42,6 @@ def call(script, body) {
     def buildArgs = config.buildArgs
     def progress = config.get('progress', 'auto')
     def enableCache = false
-    def credentialsId = config.get('credentialsId', env.REGISTRY_CREDENTIALS_ID)
 
     // 构建Docker命令
     def command = []
@@ -86,9 +85,7 @@ def call(script, body) {
     def cmd = command.join(" ")
 
     script.echo "📋 构建命令: ${cmd}"
-    script.withDockerRegistry(credentialsId: "${credentialsId}", url: "http://${host}") {
-        script.sh cmd
-    }
+    script.sh cmd
 }
 
 return this

@@ -13,7 +13,7 @@ def call(script, body) {
     def version = config.version
     def mirror = config.mirror
     def command = []
-    if mirror == null || mirror.trim() == "" {
+    if (mirror == null || mirror.trim() == "") {
         command << "curl -fsSL https://get.docker.com | bash -s docker --version ${version} --no-autostart"
     } else{
         command << "curl -fsSL https://get.docker.com | bash -s docker --mirror ${mirror} --version ${version} --no-autostart"

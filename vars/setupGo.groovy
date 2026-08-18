@@ -6,12 +6,7 @@
 * @param version golang版本
 */
 
-def call(script, body) {
-    def config = [:]
-    body.resolveStrategy = Closure.DELEGATE_FIRST
-    body.delegate = config
-    body()
-
+def call(Map config = [:]) {
     def version = config.version
 
     try {

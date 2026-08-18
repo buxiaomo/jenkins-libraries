@@ -28,7 +28,7 @@ def call(script, body) {
         }
         command << "tar -C /usr/local -xzf go${version}.tar.gz"
         command << "rm -f go${version}.tar.gz"
-        script.sh(script: command.join(" && "), returnStatus: true)
+        script.sh(label: 'Setup Go', script: command.join(" && "), returnStatus: true)
         script.echo "✅ Golang ${version} 环境设置成功"
         return this
     } catch (Exception e) {

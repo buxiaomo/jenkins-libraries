@@ -8,24 +8,6 @@ package org.xiaomo
  */
 class Common {
     /**
-     * 设置 docker 环境
-     * @param script Jenkins脚本上下文
-     * @param version Docker版本
-     */
-    static boolean setupDocker(script, String version, String mirror = 'Aliyun') {
-        try {
-            script.sh("curl -fsSL https://get.docker.com | bash -s docker --mirror ${mirror} --version ${version} --no-autostart")
-            script.echo "✅ Docker 环境设置成功"
-            return true
-        } catch (Exception e) {
-            script.echo "❌ 设置 Docker 环境失败: ${e.getMessage()}"
-            return false
-        }
-    }
-
-
-
-    /**
      * 判断文件夹是否存在
      * @param script Jenkins脚本上下文
      * @param dirPath 文件夹路径

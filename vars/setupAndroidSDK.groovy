@@ -6,25 +6,6 @@
 * @param version android sdk版本
 */
 
-// # Set Android SDK environment
-
-// ENV PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools"
-
-// # Install Android command-line tools, Node.js, accept licenses and create app directory
-// RUN  && \
-//      && \
-//      && \
-//      && \
-//      && \
-//      && \
-//      && \
-//      && \
-//      && \
-//      && \
-//      && \
-//     mkdir -p /app && \
-//     chown -R 1001:1001 /app ${ANDROID_HOME}
-
 def call(script, body) {
     def config = [:]
     body.resolveStrategy = Closure.DELEGATE_FIRST

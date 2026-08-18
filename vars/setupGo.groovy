@@ -13,21 +13,22 @@ def call(script, body) {
     body()
 
     def version = config.version
+    def command = []
 
     try {
         // 判断运行环境架构
         def arch = script.sh(script: "uname -m", returnStdout: true).trim()
         if (arch == "x86_64") {
-            script.sh("wget https://go.dev/dl/go${version}.linux-amd64.tar.gz -O go${version}.tar.gz")
+            command << "wget https://go.dev/dl/go${version}.linux-amd64.tar.gz -O go${version}.tar.gz"
         } else if (arch == "aarch64") {
-            script.sh("wget https://go.dev/dl/go${version}.linux-arm64.tar.gz -O go${version}.tar.gz")
+            command << "wget https://go.dev/dl/go${version}.linux-arm64.tar.gz -O go${version}.tar.gz"
         } else {
             script.echo "❌ 不支持的架构: ${arch}"
             return this
         }
-        script.sh("tar -C /usr/local -xzf go${version}.tar.gz")
-        script.sh("rm -f go${version}.tar.gz")
-        script.sh("export PATH=/usr/local/go/bin:$PATH")
+        command << "tar -C /usr/local -xzf go${version}.tar.gz"
+        command << "rm -f go${version}.tar.gz"
+        script.sh(script: command.join(" && "), returnStatus: true)
         script.echo "✅ Golang ${version} 环境设置成功"
         return this
     } catch (Exception e) {

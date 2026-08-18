@@ -42,8 +42,8 @@ def call(script, body) {
         command << "unzip -q cmdline-tools.zip -d ${ANDROID_HOME}/cmdline-tools"
         command << "mv ${ANDROID_HOME}/cmdline-tools/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest"
         command << "rm cmdline-tools.zip"
-        command << "yes | sdkmanager --licenses > /dev/null 2>&1"
-        command << "sdkmanager \"platform-tools\" \"platforms;android-36\" \"build-tools;36.0.0\" \"ndk;27.1.12297006\""
+        command << "yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1"
+        command << "/opt/android-sdk/cmdline-tools/latest/bin/sdkmanager \"platform-tools\" \"platforms;android-36\" \"build-tools;36.0.0\" \"ndk;27.1.12297006\""
         command << "echo \"✅ Android SDK ${version} 环境设置成功\""
         script.sh(label: 'Setup Android SDK', script: command.join(" && "), returnStatus: true)
         return this

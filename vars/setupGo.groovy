@@ -19,9 +19,9 @@ def call(script, body) {
         // 判断运行环境架构
         def arch = script.sh(script: "uname -m", returnStdout: true).trim()
         if (arch == "x86_64") {
-            command << "wget https://go.dev/dl/go${version}.linux-amd64.tar.gz -O go${version}.tar.gz"
+            command << "wget -q https://go.dev/dl/go${version}.linux-amd64.tar.gz -O go${version}.tar.gz"
         } else if (arch == "aarch64") {
-            command << "wget https://go.dev/dl/go${version}.linux-arm64.tar.gz -O go${version}.tar.gz"
+            command << "wget -q https://go.dev/dl/go${version}.linux-arm64.tar.gz -O go${version}.tar.gz"
         } else {
             script.echo "❌ 不支持的架构: ${arch}"
             return this

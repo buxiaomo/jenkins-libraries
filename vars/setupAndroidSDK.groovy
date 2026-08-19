@@ -25,7 +25,7 @@ def call(script, body) {
         command << "rm cmdline-tools.zip"
         command << "echo 'export ANDROID_HOME=${ANDROID_HOME}' >> /etc/profile.d/android-sdk.sh"
         command << "echo 'export PATH=${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:\$PATH' >> /etc/profile.d/android-sdk.sh"
-        command << "yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1"
+        command << "yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses"
         command << "/opt/android-sdk/cmdline-tools/latest/bin/sdkmanager \"platform-tools\" \"platforms;android-36\" \"build-tools;36.0.0\" \"ndk;27.1.12297006\""
         command << "echo \"✅ Android SDK ${version} 环境设置成功\""
         def status = script.sh(label: 'Setup Android SDK', script: command.join(" && "), returnStatus: true)

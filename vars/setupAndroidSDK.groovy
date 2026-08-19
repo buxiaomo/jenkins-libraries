@@ -23,11 +23,11 @@ def call(script, body) {
         command << "mkdir -p ${ANDROID_HOME}/cmdline-tools"
         command << "wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip"
         command << "unzip -q cmdline-tools.zip -d ${ANDROID_HOME}/cmdline-tools"
-        command << "ln -sf /opt/android-sdk/cmdline-tools/latest/bin/* /usr/local/bin/"
+        command << "ln -sf ${ANDROID_HOME}/cmdline-tools/latest/bin/* /usr/local/bin/"
         command << "mv ${ANDROID_HOME}/cmdline-tools/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest"
         command << "rm cmdline-tools.zip"
-        command << "yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses"
-        command << "/opt/android-sdk/cmdline-tools/latest/bin/sdkmanager \"platform-tools\" \"platforms;android-${compileSdk}\" \"build-tools;${compileSdk}.0.0\" \"ndk;${ndkVersion}\""
+        command << "yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses"
+        command << "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager \"platform-tools\" \"platforms;android-${compileSdk}\" \"build-tools;${compileSdk}.0.0\" \"ndk;${ndkVersion}\""
         command << "echo \"✅ Android SDK ${compileSdk} 环境设置成功\""
         def status = script.sh(label: 'Setup Android SDK', script: command.join(" && "), returnStatus: true)
         if (status != 0) {

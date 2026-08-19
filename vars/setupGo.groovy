@@ -19,9 +19,9 @@ def call(script, body) {
         // 判断运行环境架构
         def arch = script.sh(script: "uname -m", returnStdout: true).trim()
         if (arch == "x86_64") {
-            command << "wget -q https://go.dev/dl/go${version}.linux-amd64.tar.gz -O go${version}.tar.gz"
+            command << "wget https://go.dev/dl/go${version}.linux-amd64.tar.gz -O go${version}.tar.gz"
         } else if (arch == "aarch64") {
-            command << "wget -q https://go.dev/dl/go${version}.linux-arm64.tar.gz -O go${version}.tar.gz"
+            command << "wget https://go.dev/dl/go${version}.linux-arm64.tar.gz -O go${version}.tar.gz"
         } else {
             script.echo "❌ 不支持的架构: ${arch}"
             return this
@@ -29,7 +29,10 @@ def call(script, body) {
         command << "tar -C /usr/local -xzf go${version}.tar.gz"
         command << "rm -f go${version}.tar.gz"
         command << "echo \"✅ Golang ${version} 环境设置成功\""
-        script.sh(label: 'Setup Go', script: command.join(" && "), returnStatus: true)
+        def status = script.sh(label: 'Setup Go', script: command.join(" && "), returnStatus: true)
+        if (status != 0) {
+            script.error("设置 Golang ${version} 环境失败，退出码：${status}")
+        }
         return this
     } catch (Exception e) {
         script.echo "❌ 设置 Golang ${version} 环境失败: ${e.getMessage()}"

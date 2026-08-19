@@ -19,7 +19,10 @@ def call(script, body) {
         command << "curl -fsSL https://get.docker.com | bash -s docker --mirror ${mirror} --version ${version} --no-autostart"
     }
     command << "echo \"✅ Docker ${version} 环境设置成功\""
-    script.sh(label: 'Setup Docker', script: command.join(" && "), returnStatus: true)
+    def status = script.sh(label: 'Setup Docker', script: command.join(" && "), returnStatus: true)
+    if (status != 0) {
+        script.error("设置 Docker ${version} 环境失败，退出码：${status}")
+    }
 }
 
 return this

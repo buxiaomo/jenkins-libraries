@@ -28,6 +28,8 @@ def call(script, body) {
         }
         command << "tar -C /usr/local -xzf go${version}.tar.gz"
         command << "rm -f go${version}.tar.gz"
+        command << "echo 'export GOPATH=/usr/local/go' >> /etc/profile.d/go.sh"
+        command << "echo 'export PATH=/usr/local/go/bin:\$PATH' >> /etc/profile.d/go.sh"
         command << "echo \"✅ Golang ${version} 环境设置成功\""
         def status = script.sh(label: 'Setup Go', script: command.join(" && "), returnStatus: true)
         if (status != 0) {

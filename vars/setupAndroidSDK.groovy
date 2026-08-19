@@ -13,7 +13,8 @@ def call(script, body) {
     body()
 
     def ANDROID_HOME = "/opt/android-sdk"
-    def version = config.version
+    def compileSdk = config.compileSdk
+    def ndkVersion = config.ndkVersion
 
     def command = []
 
@@ -26,7 +27,7 @@ def call(script, body) {
         command << "mv ${ANDROID_HOME}/cmdline-tools/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest"
         command << "rm cmdline-tools.zip"
         command << "yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses"
-        command << "/opt/android-sdk/cmdline-tools/latest/bin/sdkmanager \"platform-tools\" \"platforms;android-36\" \"build-tools;36.0.0\" \"ndk;27.1.12297006\""
+        command << "/opt/android-sdk/cmdline-tools/latest/bin/sdkmanager \"platform-tools\" \"platforms;android-${compileSdk}\" \"build-tools;${compileSdk}.0.0\" \"ndk;${ndkVersion}\""
         command << "echo \"✅ Android SDK ${version} 环境设置成功\""
         def status = script.sh(label: 'Setup Android SDK', script: command.join(" && "), returnStatus: true)
         if (status != 0) {

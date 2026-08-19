@@ -21,9 +21,8 @@ def call(script, body) {
 
         command << "rm -rf /usr/local/go"
         command << "tar -C /usr/local -xzf go${version}.tar.gz"
+        command << "ln -sf /usr/local/go/bin/* /usr/local/bin/"
         command << "rm -f go${version}.tar.gz"
-        command << "ln -sf /usr/local/go/bin/go /usr/local/bin/go"
-        command << "ln -sf /usr/local/go/bin/gofmt /usr/local/bin/gofmt"
         command << "echo \"✅ Golang ${version} 环境设置成功\""
         def status = script.sh(label: 'Setup Go', script: command.join(" && "), returnStatus: true)
         if (status != 0) {

@@ -6,13 +6,20 @@ def call(script, body) {
     body.delegate = config
     body()
 
+    def credentials = config.credentials
     def host = config.host
-    def username = config.username
-    def password = config.password
 
-    // 构建Docker命令
-    def cmd = "echo ${password} | docker login ${host} -u ${username} --password-stdin"
-    script.sh cmd
+    script.withCredentials([
+        script.usernamePassword(
+            credentialsId: credentials,
+            usernameVariable: 'USERNAME',
+            passwordVariable: 'PASSWORD',
+        ),
+    ]) {
+        script.sh """
+            printf '%s' "\$PASSWORD" | docker login "${config.host}" -u "\$USERNAME" --password-stdin
+        """
+    }
 }
 
 return this

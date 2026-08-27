@@ -13,8 +13,8 @@ def call(script, body) {
     body()
 
     def ANDROID_HOME = "/opt/android-sdk"
-    def commandlineToolsVersion = "15859902"
-    def commandlineToolsSHA256 = "4e4c464f145a7512b57d088ac6c278c03c9eea610886b35a5e0804e74eedf583"
+    def commandlineToolsVersion = config.commandlineToolsVersion
+    def commandlineToolsSHA256 = config.commandlineToolsSHA256
     def compileSdk = config.compileSdk
     def ndkVersion = config.ndkVersion
 

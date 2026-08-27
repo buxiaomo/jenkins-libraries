@@ -32,6 +32,7 @@ if [ -f /opt/commandlinetools-linux-${commandlineToolsVersion}_latest.zip ]; the
     fi
 else
     wget -q https://dl.google.com/android/repository/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -O /opt/commandlinetools-linux-${commandlineToolsVersion}_latest.zip
+fi
 unzip -q /opt/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -d ${ANDROID_HOME}/cmdline-tools
 ln -sf ${ANDROID_HOME}/cmdline-tools/latest/bin/* /usr/local/bin/
 mv ${ANDROID_HOME}/cmdline-tools/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest

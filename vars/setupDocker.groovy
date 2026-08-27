@@ -19,7 +19,7 @@ if [ ! -f /package/docker-${version}.tgz ]; then
 fi
 mkdir -p /usr/local/lib/docker/cli-plugins
 cp /package/docker-compose /usr/local/lib/docker/cli-plugins
-chmox +x /usr/local/lib/docker/cli-plugins/docker-compose
+chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
 tar -xf /package/docker-${version}.tgz -C /usr/bin --strip-components=1
 docker -v
 docker compose version

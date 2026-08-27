@@ -7,24 +7,17 @@ def call(script, body) {
     body()
 
     def version = config.version
-    def command = []
-
+    def command = """
+if [ ! -f /package/go${version}.linux-amd64.tar.gz ]; then
+    wget -q https://go.dev/dl/go${version}.linux-amd64.tar.gz -O /package/go${version}.linux-amd64.tar.gz
+fi
+rm -rf /usr/local/go
+tar -xf /package/go${version}.linux-amd64.tar.gz -C /usr/local
+ln -sf /usr/local/go/bin/* /usr/local/bin/
+go version
+"""
     try {
-        def arch = script.sh(script: "uname -m", returnStdout: true).trim()
-        if (arch == "x86_64") {
-            command << "wget https://go.dev/dl/go${version}.linux-amd64.tar.gz -O go${version}.tar.gz"
-        } else if (arch == "aarch64") {
-            command << "wget https://go.dev/dl/go${version}.linux-arm64.tar.gz -O go${version}.tar.gz"
-        } else {
-            script.error("❌ 不支持的架构: ${arch}")
-        }
-
-        command << "rm -rf /usr/local/go"
-        command << "tar -C /usr/local -xzf go${version}.tar.gz"
-        command << "ln -sf /usr/local/go/bin/* /usr/local/bin/"
-        command << "rm -f go${version}.tar.gz"
-        command << "echo \"✅ Golang ${version} 环境设置成功\""
-        def status = script.sh(label: 'Setup Go', script: command.join(" && "), returnStatus: true)
+        def status = script.sh(label: 'Setup Go', script: command, returnStatus: true)
         if (status != 0) {
             script.error("设置 Golang ${version} 环境失败，退出码：${status}")
         }

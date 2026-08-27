@@ -24,10 +24,10 @@ def call(script, body) {
     try {
         cmd = """
 mkdir -p ${ANDROID_HOME}/cmdline-tools
-if [ ! -f /opt/commandlinetools-linux-${commandlineToolsVersion}_latest.zip ]; then
-    wget -q https://dl.google.com/android/repository/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -O /opt/commandlinetools-linux-${commandlineToolsVersion}_latest.zip
+if [ ! -f /package/commandlinetools-linux-${commandlineToolsVersion}_latest.zip ]; then
+    wget -q https://dl.google.com/android/repository/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -O /package/commandlinetools-linux-${commandlineToolsVersion}_latest.zip
 fi
-unzip -q /opt/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -d ${ANDROID_HOME}/cmdline-tools
+unzip -q /package/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -d ${ANDROID_HOME}/cmdline-tools
 ln -sf ${ANDROID_HOME}/cmdline-tools/latest/bin/* /usr/local/bin/
 mv ${ANDROID_HOME}/cmdline-tools/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest
 yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses

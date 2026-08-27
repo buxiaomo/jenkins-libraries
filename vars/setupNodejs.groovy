@@ -13,7 +13,7 @@ def call(script, body) {
     def version = config.version
     def cmd = """
 if [ ! -f /package/node-v${version}-linux-x64.tar.xz ]; then
-    wget -q https://nodejs.org/dist/${version}/node-v${version}-linux-x64.tar.xz -O /package/node-v${version}-linux-x64.tar.xz
+    wget -q https://nodejs.org/dist/v${version}/node-v${version}-linux-x64.tar.xz -O /package/node-v${version}-linux-x64.tar.xz
 fi
 tar -xf /package/node-v${version}-linux-x64.tar.xz -C /usr/local --strip-components=1
 node -v

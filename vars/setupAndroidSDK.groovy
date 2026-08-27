@@ -13,6 +13,8 @@ def call(script, body) {
     body()
 
     def ANDROID_HOME = "/opt/android-sdk"
+    def commandlineToolsVersion = "15859902"
+    def commandlineToolsSHA256 = "4e4c464f145a7512b57d088ac6c278c03c9eea610886b35a5e0804e74eedf583"
     def compileSdk = config.compileSdk
     def ndkVersion = config.ndkVersion
 
@@ -20,16 +22,23 @@ def call(script, body) {
 
 
     try {
-        command << "mkdir -p ${ANDROID_HOME}/cmdline-tools"
-        command << "wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip"
-        command << "unzip -q cmdline-tools.zip -d ${ANDROID_HOME}/cmdline-tools"
-        command << "ln -sf ${ANDROID_HOME}/cmdline-tools/latest/bin/* /usr/local/bin/"
-        command << "mv ${ANDROID_HOME}/cmdline-tools/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest"
-        command << "rm cmdline-tools.zip"
-        command << "yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses"
-        command << "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager \"platform-tools\" \"platforms;android-${compileSdk}\" \"build-tools;${compileSdk}.0.0\" \"ndk;${ndkVersion}\""
-        command << "echo \"✅ Android SDK ${compileSdk} 环境设置成功\""
-        def status = script.sh(label: 'Setup Android SDK', script: command.join(" && "), returnStatus: true)
+        cmd = """
+mkdir -p ${ANDROID_HOME}/cmdline-tools
+if [ -f /opt/commandlinetools-linux-${commandlineToolsVersion}_latest.zip ]; then
+    sha256sum /opt/commandlinetools-linux-${commandlineToolsVersion}_latest.zip | grep ${commandlineToolsSHA256}
+    if [ $? -ne 0 ]; then
+        echo "❌ commandlinetools-linux-${commandlineToolsVersion}_latest.zip 文件校验失败，重新下载"
+        wget -q https://dl.google.com/android/repository/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -O /opt/commandlinetools-linux-${commandlineToolsVersion}_latest.zip
+    fi
+else
+    wget -q https://dl.google.com/android/repository/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -O /opt/commandlinetools-linux-${commandlineToolsVersion}_latest.zip
+unzip -q /opt/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -d ${ANDROID_HOME}/cmdline-tools
+ln -sf ${ANDROID_HOME}/cmdline-tools/latest/bin/* /usr/local/bin/
+mv ${ANDROID_HOME}/cmdline-tools/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest
+yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses
+${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager \"platform-tools\" \"platforms;android-${compileSdk}\" \"build-tools;${compileSdk}.0.0\" \"ndk;${ndkVersion}\"
+"""
+        def status = script.sh(label: 'Setup Android SDK', script: cmd, returnStatus: true)
         if (status != 0) {
             script.error("设置 Android SDK ${compileSdk} 环境失败，退出码：${status}")
         }

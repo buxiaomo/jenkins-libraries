@@ -15,6 +15,8 @@ def call(script, body) {
     def command = """
 if [ ! -f /package/docker-${version}.tgz ]; then
     wget -q https://download.docker.com/linux/static/stable/x86_64/docker-${version}.tgz -O /package/docker-${version}.tgz
+fi
+if [ ! -f /package/docker-compose-v${composeVersion} ]; then
     wget -q https://github.com/docker/compose/releases/download/v${composeVersion}/docker-compose-linux-x86_64 -O /package/docker-compose-v${composeVersion}
 fi
 mkdir -p /usr/local/lib/docker/cli-plugins

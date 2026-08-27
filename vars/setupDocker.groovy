@@ -15,10 +15,10 @@ def call(script, body) {
     def command = """
 if [ ! -f /package/docker-${version}.tgz ]; then
     wget -q https://download.docker.com/linux/static/stable/x86_64/docker-${version}.tgz -O /package/docker-${version}.tgz
-    wget -q https://github.com/docker/compose/releases/download/v${composeVersion}/docker-compose-linux-x86_64-v${composeVersion} -O /package/docker-compose
+    wget -q https://github.com/docker/compose/releases/download/v${composeVersion}/docker-compose-linux-x86_64 -O /package/docker-compose-v${composeVersion}
 fi
 mkdir -p /usr/local/lib/docker/cli-plugins
-cp /package/docker-compose /usr/local/lib/docker/cli-plugins
+cp /package/docker-compose-v${composeVersion} /usr/local/lib/docker/cli-plugins/docker-compose
 chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
 tar -xf /package/docker-${version}.tgz -C /usr/bin --strip-components=1
 docker -v

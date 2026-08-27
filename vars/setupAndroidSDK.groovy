@@ -14,7 +14,7 @@ def call(script, body) {
 
     def ANDROID_HOME = "/opt/android-sdk"
     def commandlineToolsVersion = config.commandlineToolsVersion
-    def commandlineToolsSHA256 = config.commandlineToolsSHA256
+    def commandlineToolsSHA = config.commandlineToolsSHA
     def compileSdk = config.compileSdk
     def ndkVersion = config.ndkVersion
 
@@ -24,13 +24,7 @@ def call(script, body) {
     try {
         cmd = """
 mkdir -p ${ANDROID_HOME}/cmdline-tools
-if [ -f /opt/commandlinetools-linux-${commandlineToolsVersion}_latest.zip ]; then
-    sha256sum /opt/commandlinetools-linux-${commandlineToolsVersion}_latest.zip | grep ${commandlineToolsSHA256}
-    if [ $? -ne 0 ]; then
-        echo "❌ commandlinetools-linux-${commandlineToolsVersion}_latest.zip 文件校验失败，重新下载"
-        wget -q https://dl.google.com/android/repository/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -O /opt/commandlinetools-linux-${commandlineToolsVersion}_latest.zip
-    fi
-else
+if [ ! -f /opt/commandlinetools-linux-${commandlineToolsVersion}_latest.zip ]; then
     wget -q https://dl.google.com/android/repository/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -O /opt/commandlinetools-linux-${commandlineToolsVersion}_latest.zip
 fi
 unzip -q /opt/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -d ${ANDROID_HOME}/cmdline-tools

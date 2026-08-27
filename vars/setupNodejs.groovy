@@ -18,8 +18,10 @@ fi
 tar -xf /package/node-v${version}-linux-x64.tar.xz -C /usr/local --strip-components=1
 node -v
 """
-    script.sh(label: 'Setup Node.js', script: cmd, returnStatus: true)
+    def status = script.sh(label: 'Setup Node.js', script: cmd, returnStatus: true)
+    if (status != 0) {
+        script.error("设置 Node.js ${version} 环境失败，退出码：${status}")
+    }
 }
 
 return this
-

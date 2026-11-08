@@ -27,10 +27,13 @@ mkdir -p ${ANDROID_HOME}
 if [ ! -f /package/commandlinetools-linux-${commandlineToolsVersion}_latest.zip ]; then
     wget -q https://dl.google.com/android/repository/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -O /package/commandlinetools-linux-${commandlineToolsVersion}_latest.zip
 fi
-unzip -q /package/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -d ${ANDROID_HOME}
-ln -sf ${ANDROID_HOME}/cmdline-tools/bin/* /usr/local/bin/
-yes | ${ANDROID_HOME}/cmdline-tools/bin/sdkmanager --licenses
-${ANDROID_HOME}/cmdline-tools/bin/sdkmanager \"platform-tools\" \"platforms;android-${compileSdk}\" \"build-tools;${compileSdk}.0.0\" \"ndk;${ndkVersion}\"
+unpack_dir=\$(mktemp -d)
+unzip -q /package/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -d "\$unpack_dir"
+cp -R "\$unpack_dir/cmdline-tools/." "${androidHome}/cmdline-tools/latest/"
+rm -rf "\$unpack_dir"
+ln -sf "${ANDROID_HOME}"/cmdline-tools/latest/bin/* /usr/local/bin/
+yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses
+${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager \"platform-tools\" \"platforms;android-${compileSdk}\" \"build-tools;${compileSdk}.0.0\" \"ndk;${ndkVersion}\"
 """
         def status = script.sh(label: 'Setup Android SDK', script: cmd, returnStatus: true)
         if (status != 0) {

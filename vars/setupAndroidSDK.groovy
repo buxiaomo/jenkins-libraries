@@ -23,7 +23,7 @@ def call(script, body) {
 
     try {
         cmd = """
-mkdir -p ${ANDROID_HOME}/cmdline-tools
+mkdir -p ${ANDROID_HOME}
 if [ ! -f /package/commandlinetools-linux-${commandlineToolsVersion}_latest.zip ]; then
     wget -q https://dl.google.com/android/repository/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -O /package/commandlinetools-linux-${commandlineToolsVersion}_latest.zip
 fi

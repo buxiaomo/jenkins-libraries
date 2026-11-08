@@ -28,11 +28,9 @@ if [ ! -f /package/commandlinetools-linux-${commandlineToolsVersion}_latest.zip 
     wget -q https://dl.google.com/android/repository/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -O /package/commandlinetools-linux-${commandlineToolsVersion}_latest.zip
 fi
 unzip -q /package/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -d ${ANDROID_HOME}
-ls -l ${ANDROID_HOME}/cmdline-tools/
-ln -sf ${ANDROID_HOME}/cmdline-tools/latest/bin/* /usr/local/bin/
-mv ${ANDROID_HOME}/cmdline-tools/cmdline-tools ${ANDROID_HOME}/cmdline-tools/latest
-yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses
-${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager \"platform-tools\" \"platforms;android-${compileSdk}\" \"build-tools;${compileSdk}.0.0\" \"ndk;${ndkVersion}\"
+ln -sf ${ANDROID_HOME}/cmdline-tools/bin/* /usr/local/bin/
+yes | ${ANDROID_HOME}/cmdline-tools/bin/sdkmanager --licenses
+${ANDROID_HOME}/cmdline-tools/bin/sdkmanager \"platform-tools\" \"platforms;android-${compileSdk}\" \"build-tools;${compileSdk}.0.0\" \"ndk;${ndkVersion}\"
 """
         def status = script.sh(label: 'Setup Android SDK', script: cmd, returnStatus: true)
         if (status != 0) {

@@ -29,7 +29,7 @@ if [ ! -f /package/commandlinetools-linux-${commandlineToolsVersion}_latest.zip 
 fi
 unpack_dir=\$(mktemp -d)
 unzip -q /package/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -d "\$unpack_dir"
-cp -R "\$unpack_dir/cmdline-tools/." "${androidHome}/cmdline-tools/latest/"
+cp -R "\$unpack_dir/cmdline-tools/." "${ANDROID_HOME}/cmdline-tools/latest/"
 rm -rf "\$unpack_dir"
 ln -sf "${ANDROID_HOME}"/cmdline-tools/latest/bin/* /usr/local/bin/
 yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses

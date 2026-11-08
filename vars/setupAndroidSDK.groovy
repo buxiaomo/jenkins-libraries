@@ -18,12 +18,10 @@ def call(script, body) {
     def compileSdk = config.compileSdk
     def ndkVersion = config.ndkVersion
 
-    def command = []
-
-
     try {
         cmd = """
-mkdir -p ${ANDROID_HOME}
+set -eu
+mkdir -p ${ANDROID_HOME}/cmdline-tools/latest
 if [ ! -f /package/commandlinetools-linux-${commandlineToolsVersion}_latest.zip ]; then
     wget -q https://dl.google.com/android/repository/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -O /package/commandlinetools-linux-${commandlineToolsVersion}_latest.zip
 fi
@@ -43,7 +41,7 @@ ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager \"platform-tools\" \"platfor
         return this
     } catch (Exception e) {
         script.echo "❌ 设置 Android SDK ${compileSdk} 环境失败: ${e.getMessage()}"
-        return this
+        throw e
     }
 }
 

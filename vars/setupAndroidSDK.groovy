@@ -29,11 +29,10 @@ unpack_dir=\$(mktemp -d)
 unzip -q /package/commandlinetools-linux-${commandlineToolsVersion}_latest.zip -d "\$unpack_dir"
 cp -R "\$unpack_dir/cmdline-tools/." "${ANDROID_HOME}/cmdline-tools/latest/"
 rm -rf "\$unpack_dir"
-ls -l "${ANDROID_HOME}/"
 ln -sf ${ANDROID_HOME}/cmdline-tools/latest/bin/* /usr/local/bin/
-ln -sf ${ANDROID_HOME}/platform-tools/adb /usr/local/bin/adb
 yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses
 ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager \"platform-tools\" \"platforms;android-${compileSdk}\" \"build-tools;${compileSdk}.0.0\" \"ndk;${ndkVersion}\"
+ln -sf ${ANDROID_HOME}/platform-tools/adb /usr/local/bin/adb
 """
         def status = script.sh(label: 'Setup Android SDK', script: cmd, returnStatus: true)
         if (status != 0) {

@@ -12,7 +12,7 @@ def call(script, body) {
     body.delegate = config
     body()
 
-    def MAESTRO_HOME = "/opt/maestro"
+    def MAESTRO_HOME = "/opt"
     def version = config.version
     def command = []
 

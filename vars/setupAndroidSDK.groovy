@@ -33,6 +33,7 @@ ln -sf ${ANDROID_HOME}/cmdline-tools/latest/bin/* /usr/local/bin/
 yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses
 ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager \"platform-tools\" \"platforms;android-${compileSdk}\" \"build-tools;${compileSdk}.0.0\" \"ndk;${ndkVersion}\"
 ln -sf ${ANDROID_HOME}/platform-tools/adb /usr/local/bin/adb
+ls -l ${ANDROID_HOME}/platform-tools
 """
         def status = script.sh(label: 'Setup Android SDK', script: cmd, returnStatus: true)
         if (status != 0) {

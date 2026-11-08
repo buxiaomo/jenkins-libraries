@@ -24,7 +24,7 @@ if [ ! -f /package/maestro-${version}.zip ]; then
     wget -q https://github.com/mobile-dev-inc/Maestro/releases/download/cli-${version}/maestro.zip -O /package/maestro-${version}.zip
 fi
 unzip -q /package/maestro-${version}.zip -d ${MAESTRO_HOME}/
-ln -sf ${MAESTRO_HOME}/bin/* /usr/local/bin/
+ln -sf ${MAESTRO_HOME}/maestro/bin/* /usr/local/bin/
 """
         def status = script.sh(label: 'Setup Maestro', script: cmd, returnStatus: true)
         if (status != 0) {
